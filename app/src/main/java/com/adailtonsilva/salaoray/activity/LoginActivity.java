@@ -35,21 +35,41 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //Inicia a conexão com o Firebase pra verificar se ja esta logado
         auth = ConfiguraBD.FirebaseAutenticacao();
         inicializarComponentes();
     }
+    //Override deleta a config padrão do onStart
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //Pega o usuario atual e verifica se ja esta cadastrado,caso sim ele loga automatico
+        FirebaseUser usuarioAuth = auth.getCurrentUser();
+        if(usuarioAuth != null){
+            abrirHome();
+        }
+    }
 
+    //Carrega os dados da tela para as variaveis
+    private void inicializarComponentes(){
+        campoEmail = findViewById(R.id.txtEmailLogin);
+        campoSenha = findViewById(R.id.txtSenhaLogin);
+        botaoAcessar = findViewById(R.id.btnAcessar);
+    }
+
+    //Acionado pelo botao
     public void validarAutenticacao(View view){
         String email = campoEmail.getText().toString();
         String senha = campoSenha.getText().toString();
 
+        //Verifica se campos vazios
         if(!email.isEmpty()){
             if(!senha.isEmpty()){
 
                 Usuario usuario = new Usuario();
                 usuario.setEmail(email);
                 usuario.setSenha(senha);
-
+                //Caso tudo certo chama o método logar
                 logar(usuario);
 
             }else{
@@ -63,14 +83,17 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void logar(Usuario usuario) {
+        //Faz o login padrao com Email e Senha
         auth.signInWithEmailAndPassword(
                 usuario.getEmail(), usuario.getSenha()
         ).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+                //Caso sucesso abre a Home
                 if(task.isSuccessful()){
                     abrirHome();
                 }else{
+                    //Tratamento de possiveis erros
                     String excecao = "";
 
                     try {
@@ -90,30 +113,21 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    //Chama as Tela Home
     private void abrirHome() {
         Intent i = new Intent(LoginActivity.this,HomeActivity.class);
         startActivity(i);
     }
 
+    //Chama a tela Cadastrar
     public void cadastrar(View v){
         Intent i = new Intent(this,CadastroActivity.class);
         startActivity(i);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        FirebaseUser usuarioAuth = auth.getCurrentUser();
-        if(usuarioAuth != null){
-            abrirHome();
-        }
-    }
 
-    private void inicializarComponentes(){
-        campoEmail = findViewById(R.id.txtEmailLogin);
-        campoSenha = findViewById(R.id.txtSenhaLogin);
-        botaoAcessar = findViewById(R.id.btnAcessar);
-    }
+
+
 
 
 }

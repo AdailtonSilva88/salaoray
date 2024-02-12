@@ -33,10 +33,14 @@ public class CadastroActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(com.adailtonsilva.salaoray.R.layout.activity_cadastro);
+
+        //chamada do metódo inicializar
         inicializar();
     }
 
     public void inicializar(){
+
+        //Carregando campos da tela para variaveis
         campoNome = findViewById(com.adailtonsilva.salaoray.R.id.txtNome);
         campoTelefone = findViewById(com.adailtonsilva.salaoray.R.id.txtTelefone);
         campoEmail = findViewById(com.adailtonsilva.salaoray.R.id.txtEmail);
@@ -45,16 +49,20 @@ public class CadastroActivity extends AppCompatActivity {
 
     }
     public void validarCampos(View view){
+
+        //Convertendo campos em String
         String nome = campoNome.getText().toString();
         String telefone = campoTelefone.getText().toString();
         String email = campoEmail.getText().toString();
         String senha = campoSenha.getText().toString();
 
+        //Verificando se campos vazios e Criada a exceção para cada caso
         if(!nome.isEmpty()){
             if(!telefone.isEmpty()){
                 if(!email.isEmpty()) {
                     if (!senha.isEmpty()) {
 
+                        //Passou da verificação então carrega os dados na classe usuario
                         usuario = new Usuario();
 
                         usuario.setNome(nome);
@@ -62,7 +70,7 @@ public class CadastroActivity extends AppCompatActivity {
                         usuario.setTelefone(telefone);
                         usuario.setSenha(senha);
 
-                        //cadastrar
+                        //Chama o metodo cadastrar usuario
                         cadastrarUsuario();
 
                     } else {
@@ -84,6 +92,9 @@ public class CadastroActivity extends AppCompatActivity {
     }
 
     private void cadastrarUsuario(){
+
+        //Faz a comunicação com o Firebase pelo controle de acesso do proprio Firebase de Email e senha
+
         autenticacao = ConfiguraBD.FirebaseAutenticacao();
         autenticacao.createUserWithEmailAndPassword(
                 usuario.getEmail(),usuario.getSenha()
@@ -91,8 +102,10 @@ public class CadastroActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
+                    //Verifica se todos os passos anteriores deram certo e retorna o aviso na tela
                     Toast.makeText(CadastroActivity.this, "Sucesso ao Cadastrar usuario", Toast.LENGTH_SHORT).show();
                 }else{
+                    //Coleta a excecao de acordo com o erro
                     String excecao = "";
                     try{
                     throw task.getException();
